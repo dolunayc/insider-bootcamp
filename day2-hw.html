@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Loading</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+        }
+        #postContainer {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .post {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        #loading {
+            display: none;
+            text-align: center;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Post List</h1>
+    <div id="postContainer"></div>
+    <div id="loading">Loading...</div>
+
+    <script>
+        let start = 0;
+        const limit = 5;
+        const postContainer = $("#postContainer");
+        const loadingIndicator = $("#loading");
+
+        function fetchPosts() {
+            loadingIndicator.show(); // Show loading indicator
+            $.get(`https://jsonplaceholder.typicode.com/posts?_start=${start}&_limit=${limit}`)
+                .done(function(data) {
+                    data.forEach(post => {
+                        postContainer.append(`
+                            <div class="post">
+                                <h3>${post.title}</h3>
+                                <p>${post.body}</p>
+                            </div>
+                        `);
+                    });
+                    start += limit; // Update start index for the next request
+                })
+                .fail(function() {
+                    alert("An error occurred while loading data!"); // Show error message
+                })
+                .always(function() {
+                    loadingIndicator.hide(); // Hide loading indicator
+                });
+        }
+
+        $(document).ready(function() {
+            fetchPosts(); // Load 5 posts when the page loads
+
+            $(window).scroll(function() {
+                if ($(window).scrollTop() + $(window).height() >= $(document).height() - 10) {
+                    fetchPosts(); // Load more posts when the user reaches the bottom
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

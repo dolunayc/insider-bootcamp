@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Student Table</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 50%;
+      margin-bottom: 1rem;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+    tr.highlight {
+      background-color: #fffae6;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h1>Student List</h1>
+  
+  <!-- Student Table -->
+  <table id="student-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Class</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Will be added by JavaScript/jQuery -->
+    </tbody>
+  </table>
+
+  <!-- New Student Addition Form -->
+  <form id="add-student-form">
+    <label for="name">Student Name:</label>
+    <input type="text" id="name" placeholder="Name" />
+    
+    <label for="class">Class:</label>
+    <input type="text" id="class" placeholder="Class" />
+    
+    <button type="submit">Add</button>
+  </form>
+  
+  <!-- Error Message -->
+  <p class="error" id="error-msg" style="display:none;"></p>
+
+  <!-- jQuery Library -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <script>
+    // JSON data (Student Array)
+    let studentData = [
+      { name: "Aylin", class: "9A" },
+      { name: "Ömer", class: "11B" },
+      { name: "Mert", class: "10C" }
+    ];
+
+    // Table render function
+    function renderTable() {
+      // Clear the current table content
+      $("#student-table tbody").empty();
+
+      // Add a new row for each student
+      $.each(studentData, function(index, student) {
+        // Create a row with template literal
+        let row = $(`
+          <tr>
+            <td>${student.name}</td>
+            <td>${student.class}</td>
+            <td>
+              <button class="delete-btn">Delete</button>
+            </td>
+          </tr>
+        `);
+
+        // Change row color when clicked (highlight)
+        row.click(function() {
+          $(this).toggleClass("highlight");
+        });
+
+        // Remove student from the array when clicking delete button
+        row.find(".delete-btn").click(function(e) {
+          // Prevent row click event from triggering
+          e.stopPropagation();
+          // Remove the student from studentData array
+          studentData.splice(index, 1);
+          // Re-render the table
+          renderTable();
+        });
+
+        // Append the created row to the table
+        $("#student-table tbody").append(row);
+      });
+    }
+
+    // When the page is loaded
+    $(document).ready(function() {
+      // Initial table render
+      renderTable();
+
+      // Add new student on form submit
+      $("#add-student-form").submit(function(e) {
+        e.preventDefault(); // Prevent page reload
+        
+        let name = $("#name").val().trim();
+        let className = $("#class").val().trim();
+
+        // Simple validation
+        if(!name || !className) {
+          $("#error-msg").text("Name and class cannot be empty!").show();
+          return;
+        } else {
+          $("#error-msg").hide();
+        }
+
+        // Add the new student to the array
+        studentData.push({
+          name: name,
+          class: className
+        });
+
+        // Reset the form
+        $("#add-student-form")[0].reset();
+
+        // Re-render the table
+        renderTable();
+      });
+    });
+  </script>
+</body>
+</html>
